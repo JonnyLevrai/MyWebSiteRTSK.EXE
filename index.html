@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta chars;et="UTF-8">
+  <meta charset="UTF-8">
   <title>𝐑𝐓𝐒𝐊.𝐄𝐗𝐄™</title>
   <style>
     body {
       background-color: #000;
       color: #0f0;
-      font-family: "Courier New", Courier, monospace;
+      font-family: "Courier New", monospace;
       padding: 20px;
+      overflow: hidden;
     }
 
     h1 {
@@ -18,75 +19,131 @@
       text-shadow: 0 0 5px #0ff;
     }
 
-    .playlist {
-      margin-top: 30px;
-    }
-
-    .track {
-      margin: 15px 0;
-    }
-
-    audio {
-      width: 100%;
-      outline: none;
-      background-color: #111;
-      border: 1px solid #0f0;
-    }
-
     .terminal-box {
       border: 1px solid #0f0;
-      padding: 10px;
+      padding: 15px;
       background-color: #111;
-      margin-top: 30px;
+      margin: 30px auto;
+      width: 90%;
+      max-width: 600px;
+      height: 200px;
+      overflow-y: auto;
     }
 
     .terminal-line {
       margin: 5px 0;
     }
 
-    a {
+    .hidden {
+      display: none;
+    }
+
+    #player-section {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #track-name {
+      font-size: 1.2em;
       color: #0ff;
-      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
+    audio {
+      width: 80%;
+      background-color: #111;
+      border: 2px solid #0f0;
+      border-radius: 5px;
+    }
+
+    select {
+      margin-top: 20px;
+      background-color: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      font-family: monospace;
+      padding: 5px;
     }
   </style>
+
+  <script>
+    // Protection clic droit
+    document.addEventListener('contextmenu', event => event.preventDefault());
+  </script>
 </head>
 <body>
 
   <h1>𝐑𝐓𝐒𝐊.𝐄𝐗𝐄™</h1>
 
-  <div class="terminal-box">
-    <div class="terminal-line">> Initialisation du système...</div>
-    <div class="terminal-line">> Accès sécurisée...</div>
-    <div class="terminal-line">> Chargement des ligne de code...</div>
+  <div id="loading" class="terminal-box">
+    <div class="terminal-line">[~] Initialisation du système...</div>
   </div>
 
-  <div class="playlist">
-    <h2>🎧 Playlist de 𝐑𝐓𝐒𝐊.𝐄𝐗𝐄™</h2>
+  <div id="player-section" class="hidden">
+    <div id="track-name">🎧 Aucun morceau sélectionné</div>
 
-    <div class="track">
-      <p>▶ Track 1: Miku</p>
-      <audio controls>
-        <source src="SpotiMate.io - Miku - Anamanaguchi.mp3" type="audio/mp3">
-        Ton navigateur ne supporte pas l'audio.
-      </audio>
-    </div>
+    <audio id="audio-player" controls controlsList="nodownload">
+      <source id="audio-source" src="" type="audio/mp3">
+      Ton navigateur ne supporte pas l'audio HTML5.
+    </audio>
 
-    <div class="track">
-      <p>▶ Track 2: Ievan Polkka</p>
-      <audio controls>
-        <source src="Hatsune Miku - Ievan Polkka.mp3" type="audio/mp3">
-        Ton navigateur ne supporte pas l'audio.
-      </audio>
-    </div>
-
-    <div class="track">
-      <p>▶ Track 3: Caramelldansen </p>
-      <audio controls>
-        <source src="Caramella Girls - Caramelldansen HD Version (Swedish Original) (1).mp3" type="audio/mp3">
-        Ton navigateur ne supporte pas l'audio.
-      </audio>
+    <div>
+      <select id="track-select">
+        <option value="">-- Choisis un morceau --</option>
+        <option value="SpotiMate.io - Miku - Anamanaguchi.mp3">MIKU</option>
+        <option value="Hatsune Miku - Ievan Polkka.mp3">Ievan Polkka</option>
+        <option value="Caramella Girls - Caramelldansen HD Version (Swedish Original) (1).mp3"> Caramelldansen</option>
+      </select>
     </div>
   </div>
 
+  <script>
+    const lines = [
+      "> Accès sécurisé détecté...",
+      "> Connexion à la base de données musicale...",
+      "> Chiffrement des métadonnées...",
+      "> Déploiement du lecteur audio...",
+      "> Prêt."
+    ];
+
+    let currentLine = 0;
+    const loadingBox = document.getElementById("loading");
+    const playerSection = document.getElementById("player-section");
+
+    function showNextLine() {
+      if (currentLine < lines.length) {
+        const line = document.createElement("div");
+        line.className = "terminal-line";
+        line.textContent = lines[currentLine];
+        loadingBox.appendChild(line);
+        currentLine++;
+        setTimeout(showNextLine, 700);
+      } else {
+        loadingBox.classList.add("hidden");
+        playerSection.classList.remove("hidden");
+      }
+    }
+
+    setTimeout(showNextLine, 1000);
+
+    // Gestion de la playlist
+    const audioPlayer = document.getElementById("audio-player");
+    const trackSelect = document.getElementById("track-select");
+    const trackName = document.getElementById("track-name");
+    const audioSource = document.getElementById("audio-source");
+
+    trackSelect.addEventListener("change", function () {
+      const selected = trackSelect.value;
+      if (selected) {
+        audioSource.src = selected;
+        audioPlayer.load();
+        audioPlayer.play();
+        trackName.textContent = "🎧 Lecture : " + trackSelect.options[trackSelect.selectedIndex].text;
+      } else {
+        audioPlayer.pause();
+        trackName.textContent = "🎧 Aucun morceau sélectionné";
+      }
+    });
+  </script>
 </body>
 </html>
